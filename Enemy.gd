@@ -13,6 +13,8 @@ enum {
 const SPEED = 30
 var state = MOVE
 var direction = Vector2.RIGHT
+onready var animationPlayer = $AnimationPlayer
+signal died
 
 func _ready():
 	randomize()
@@ -20,7 +22,7 @@ func _ready():
 func _process(delta):
 	match state:
 		IDLE:
-			pass
+			got_hit()
 		NEW_DIRECTION:
 			direction = choose([Vector2.RIGHT, Vector2.UP, Vector2.LEFT, Vector2.DOWN])
 			state = choose([IDLE, MOVE])
@@ -45,3 +47,9 @@ func choose(array):
 func _on_Timer_timeout():
 	$Timer.wait_time = choose([0.5,1.0])
 	state = choose([IDLE, NEW_DIRECTION, MOVE])
+
+func got_hit():
+	animationPlayer.play("getHit")
+	yield(animationPlayer, "animation_finished")
+	emit_signal("died")
+	#queue_free()
